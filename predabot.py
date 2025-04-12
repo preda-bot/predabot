@@ -3,6 +3,8 @@ import math
 import discord
 from discord import app_commands
 from datetime import datetime, timedelta
+from dotenv import load_dotenv
+load_dotenv()
 
 # ---------------------------------------
 # Constants for Leaderboard Calculations
