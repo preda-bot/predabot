@@ -203,15 +203,22 @@ async def markets(interaction: discord.Interaction):
 # ---------------------------------------
 @tree.command(name="addmarket", description="Add a new market (Admin only)")
 async def addmarket(interaction: discord.Interaction, market_id: str, title: str, source_link: str, close_date: str):
+    await interaction.response.defer(ephemeral=False)  # this keeps Discord happy while we process
+    print(f"[addmarket] received command from {interaction.user.name}")
     if not interaction.user.guild_permissions.administrator:
-        await interaction.response.send_message("You don’t have permission to use this command.", ephemeral=True)
+        await interaction.followup.send("You don’t have permission to use this command.", ephemeral=True)
         return
-    if await sheets_manager.get_market(market_id):
-        await interaction.response.send_message("A market with this ID already exists. Choose a unique identifier.")
-        return
-    await sheets_manager.add_market(market_id, title, source_link, close_date)
-    await interaction.response.send_message(f"Market **{market_id}** added successfully.")
 
+    if await sheets_manager.get_market(market_id):
+        await interaction.followup.send("A market with this ID already exists. Choose a unique identifier.")
+        return
+
+    try:
+        await sheets_manager.add_market(market_id, title, source_link, close_date)
+        await interaction.followup.send(f"Market **{market_id}** added successfully.")
+    except Exception as e:
+        print(f"[addmarket] error: {e}")
+        await interaction.followup.send("Something went wrong while adding the market.", ephemeral=True)
 # ---------------------------------------
 # /leaderboard Command
 # ---------------------------------------
